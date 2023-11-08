@@ -1,7 +1,4 @@
-import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class game {
@@ -17,6 +14,10 @@ public class game {
     public static int duel(Player p1, Player p2) {
         tic_tac_toe board = new tic_tac_toe();
         Player players[] = new Player[2];
+
+        p1.myplayernumber = 1;
+        p2.myplayernumber = 2;
+
         players[0] = p1;
         players[1] = p2;
 

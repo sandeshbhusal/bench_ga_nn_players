@@ -5,7 +5,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'ai.djl:djl-zero:0.25.0'
+    implementation group: 'ai.djl', name: 'api', version: '0.25.0'
 }
 
 sourceSets {
