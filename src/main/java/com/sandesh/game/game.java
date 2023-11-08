@@ -1,11 +1,13 @@
+package com.sandesh.game;
+
 import java.io.FileWriter;
 import java.util.HashMap;
 
 public class game {
     public static void main(String[] args) {
-        neuralnet p1, p2;
-        p1 = new neuralnet("./models/sandesh");
-        p2 = new neuralnet("./models/sandesh");
+        Player p1, p2;
+        p1 = new neuralnet("./models/sandesh.model");
+        p2 = new randomPlayer();
 
         int winner = duel(p1, p2);
         System.out.println(winner);

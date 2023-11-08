@@ -2,3 +2,4 @@
 data.csv
 .gradle/*
 ./build/*
+target/

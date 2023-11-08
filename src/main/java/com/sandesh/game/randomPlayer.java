@@ -1,3 +1,4 @@
+package com.sandesh.game;
 import java.util.Random;
 
 public class randomPlayer extends Player{
