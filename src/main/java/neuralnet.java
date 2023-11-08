@@ -1,83 +1,58 @@
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
-import ai.djl.*;
-import ai.djl.inference.Predictor;
-import ai.djl.ndarray.NDArray;
-import ai.djl.ndarray.NDList;
-import ai.djl.ndarray.NDManager;
-import ai.djl.nn.*;
-import ai.djl.nn.core.*;
-import ai.djl.translate.TranslateException;
-import ai.djl.translate.Translator;
-import ai.djl.translate.TranslatorContext;
+import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
+import org.deeplearning4j.nn.conf.layers.DenseLayer;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.nn.weights.WeightInit;
+import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 public class neuralnet extends Player {
-    File neuralnetfile;
-    Model neuralnet;
+    MultiLayerNetwork model;
 
     neuralnet(String neuralnetfile) {
         super();
-        try {
-            this.neuralnetfile = new File(neuralnetfile);
-            neuralnet.load(Paths.get("./models/"), neuralnetfile);
-        } catch (Exception e) {
-            System.err.println("Couldn't find the neural net weights file.");
-            SequentialBlock block = new SequentialBlock();
-            block.add(Linear.builder().setUnits(11).build());
-            block.add(Activation::relu);
-            block.add(Linear.builder().setUnits(16).build());
-            block.add(Activation::relu);
-            block.add(Linear.builder().setUnits(1).build());
-
-            Model model = Model.newInstance("tictactoe");
-            model.setBlock(block);
-            this.neuralnet = model;
-
-            try {
-                model.save(Paths.get("./models/"), neuralnetfile);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-            System.err.println("Initialized and saved the model.");
-        }
     }
 
     @Override
     int make_move() {
-        // Simply, feed the possible board states to the neural net,
-        // and get the max value of the possible board state.
+        MultiLayerNetwork model;
+        try {
+            model = MultiLayerNetwork.load(new File("./models/sandesh"), false);
+        } catch (IOException e) {
+            System.err.println("No model was found. Creating a new model..");
 
-        // Translator
-        Translator<int[], float> t = new Translator<int[], int[]>() {
-            @Override
-            public NDList processInput(TranslatorContext ctx, int[] input) throws Exception {
-                NDManager manager = NDManager.newBaseManager();
-                NDArray x = manager.create(input);
-                return new NDList(x);
+            MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().weightInit(WeightInit.LECUN_NORMAL)
+                    .list().layer(0, new DenseLayer.Builder().nIn(10).nOut(16).activation(Activation.RELU).build())
+                    .layer(1, new DenseLayer.Builder().nIn(16).nOut(1).activation(Activation.RELU).build())
+                    .build();
+
+            model = new MultiLayerNetwork(conf);
+            model.init();
+            try {
+                model.save(new File("./models/sandesh"));
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
+            e.printStackTrace();
+        }
 
-            @Override
-            public int[] processOutput(TranslatorContext ctx, NDList list) throws Exception {
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException("Unimplemented method 'processOutput'");
-            }
-        };
-
-        var p = neuralnet.newPredictor(t);
-
+        int bestCell = this.board.possible_moves().get(0);
+        double bestOutput = Double.NEGATIVE_INFINITY;
         for (int possible_cell : this.board.possible_moves()) {
             int[] temp_board = this.board.board.clone();
             temp_board[possible_cell] = this.myplayernumber;
+            INDArray input = Nd4j.create(temp_board);
 
-            try {
-                float value = p.predict(temp_board);
-            } catch (TranslateException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            double output = model.output(input).getDouble(0);
+            if (output >= bestOutput) {
+                bestCell = possible_cell;
             }
         }
-        return 0;
+
+        return bestCell;
     }
 }

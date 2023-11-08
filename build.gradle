@@ -5,7 +5,8 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'ai.djl', name: 'api', version: '0.25.0'
+    implementation 'org.deeplearning4j:deeplearning4j-core:1.0.0-M2.1'
+    implementation 'org.deeplearning4j:deeplearning4j-nn:1.0.0-M2.1'
 }
 
 sourceSets {

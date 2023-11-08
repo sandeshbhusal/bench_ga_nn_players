@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/home/SANDESHBHUSAL/java/ttt_rl_nn/djl/engines/paddlepaddle/paddlepaddle-native"
+    "cmake.sourceDirectory": "/home/SANDESHBHUSAL/java/ttt_rl_nn/djl/engines/paddlepaddle/paddlepaddle-native",
+    "java.configuration.updateBuildConfiguration": "automatic"
 }

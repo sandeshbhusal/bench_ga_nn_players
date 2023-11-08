@@ -3,9 +3,9 @@ import java.util.HashMap;
 
 public class game {
     public static void main(String[] args) {
-        randomPlayer p1, p2;
-        p1 = new randomPlayer();
-        p2 = new randomPlayer();
+        neuralnet p1, p2;
+        p1 = new neuralnet("./models/sandesh");
+        p2 = new neuralnet("./models/sandesh");
 
         int winner = duel(p1, p2);
         System.out.println(winner);
