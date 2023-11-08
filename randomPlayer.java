@@ -1,6 +1,6 @@
 import java.util.Random;
 
-public class randomPlayer extends player{
+public class randomPlayer extends Player{
     @Override
     int make_move() {
         Random rand = new Random();

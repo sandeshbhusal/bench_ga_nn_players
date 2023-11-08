@@ -2,114 +2,73 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class game {
     public static void main(String[] args) {
-        randomPlayer r1 = new randomPlayer();
-        randomPlayer r2 = new randomPlayer();
+        randomPlayer p1, p2;
+        p1 = new randomPlayer();
+        p2 = new randomPlayer();
 
-        int p1wins = 0;
-        int p2wins = 0;
-        int draws = 0;
-        for (int i = 0; i < 100; i++) {
-            switch (playAgainst(r1, r2)) {
-                case 0:
-                    draws += 1;
-                    break;
-                case 1:
-                    p1wins += 1;
-                    break;
-                case 2:
-                    p2wins += 1;
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        System.err.println("Tournament results: " + p1wins + " " + p2wins + " " + draws);
+        int winner = duel(p1, p2);
+        System.out.println(winner);
     }
 
-    static public int playAgainst(player p1, player p2) {
+    public static int duel(Player p1, Player p2) {
         tic_tac_toe board = new tic_tac_toe();
-        p2.board = board;
-        p1.board = board;
-
-        player players[] = new player[2];
+        Player players[] = new Player[2];
         players[0] = p1;
         players[1] = p2;
 
-        int playerindex = 1;
+        p1.board = board;
+        p2.board = board;
 
+        HashMap<int[], Integer> boards = new HashMap<>();
+        int index = 0;
         int winner = -1;
 
-        ArrayList<int[]> localBoards = new ArrayList<>();
-
         while (!board.gameover()) {
-            int[] row = new int[11];
+            Player p = players[index];
 
-            player p = players[playerindex - 1];
-            playerindex = playerindex % 2 + 1;
+            // get move from p1 and then p2.
+            int move = p.make_move();
+            board.make_move(index + 1, move);
+            boards.put(board.board.clone(), index + 1);
 
-            row[0] = playerindex;
-            board.make_move(playerindex, p.make_move());
-
-            for (int t = 0; t < board.board.length; t++) {
-                row[t + 1] = board.board[t];
-            }
-
-            localBoards.add(row);
-
-            // Generate data.
             if (board.gamewin()) {
-                if (winner == -1) {
-                    row[10] = 0;
-                    break;
-                }
-
-                if (winner == playerindex) {
-                    row[10] = 1;
-                } else {
-                    row[10] = -1;
-                }
+                winner = index + 1;
                 break;
             }
+
+            index = (index + 1) % 2;
         }
 
-        File datafile = new File("./data.csv");
-
-        try {
-            datafile.createNewFile();
-        } catch (Exception e) {
-        }
-        ;
-
-        try (FileWriter myWriter = new FileWriter("./data.csv", true)) {
-            // Iterate over the entire row, and check if the player won the game or not.
-            for (int[] row : localBoards) {
-                if (winner != -1) {
-                    if (row[0] == winner) {
-                        row[10] = 1;
-                    } else {
-                        row[10] = -1;
-                    }
-                }
-                for (int t : row) {
-                    myWriter.write(t + ", ");
-                }
-
-                myWriter.write('\n');
+        // Loop through all baords, and write data to data.csv.
+        for (int[] b : boards.keySet()) {
+            String st = "";
+            int player = boards.get(b);
+            st += player + ",";
+            for (int k : b) {
+                st += k + ",";
+            }
+            if (winner == -1) {
+                st += "0\n";
+            } else if (winner == player) {
+                st += "1\n";
+            } else {
+                st += "-1\n";
             }
 
-            myWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            // Dump data to file.
+            try {
+                FileWriter datawriter = new FileWriter("./data.csv", true);
+                datawriter.write(st);
+                datawriter.close();
+            } catch (Exception e) {
+                // Do fuckall.
+            }
         }
 
-        if (winner >= 0) {
-            return winner + 1;
-        }
-        return 0;
+        return winner;
     }
 }

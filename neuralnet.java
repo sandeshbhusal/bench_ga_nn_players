@@ -1,4 +1,4 @@
-public class neuralnet extends player{
+public class neuralnet extends Player{
 
     @Override
     int make_move() {

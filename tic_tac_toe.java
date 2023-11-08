@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-abstract class player {
+abstract class Player {
     tic_tac_toe board;
     int myplayernumber;
     abstract int make_move();

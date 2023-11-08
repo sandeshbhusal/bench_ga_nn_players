@@ -1,0 +1,3 @@
+[submodule "djl"]
+	path = djl
+	url = https://github.com/deepjavalibrary/djl
